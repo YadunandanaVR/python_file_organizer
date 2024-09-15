@@ -14,13 +14,29 @@ file_categories = {
 # Get the directory where the script is executed
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Create category folders if they don't exist
-for folder in file_categories.keys():
-    folder_path = os.path.join(script_dir, folder)
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
+# Track which categories are present
+present_categories = {category: False for category in file_categories.keys()}
 
-# Organize files into corresponding folders
+# Scan for files and determine which categories are present
+for folder, sub_folders, files in os.walk(script_dir):
+    # Skip the folders we created to avoid moving them
+    if os.path.basename(folder) in file_categories.keys():
+        continue
+
+    for file in files:
+        extension = file.split('.')[-1].lower()
+        for category, extensions in file_categories.items():
+            if extension in extensions:
+                present_categories[category] = True
+
+# Create folders for categories that are present
+for category, is_present in present_categories.items():
+    if is_present:
+        folder_path = os.path.join(script_dir, category)
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+
+# Move files to the appropriate folders
 for folder, sub_folders, files in os.walk(script_dir):
     # Skip the folders we created to avoid moving them
     if os.path.basename(folder) in file_categories.keys():
@@ -31,7 +47,7 @@ for folder, sub_folders, files in os.walk(script_dir):
         extension = file.split('.')[-1].lower()
 
         for category, extensions in file_categories.items():
-            if extension in extensions:
+            if extension in extensions and present_categories[category]:
                 target_folder = os.path.join(script_dir, category)
                 shutil.move(file_path, os.path.join(target_folder, file))
                 break  # Move to next file after finding the category
