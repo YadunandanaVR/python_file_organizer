@@ -1,96 +1,37 @@
 import os
 import shutil
 
-image_formats = ['jpg', 'png', 'jpeg', 'gif']
-video_formats = ['mp4', 'avi', 'mkv', 'webm']
-audio_formats = ['mp3', 'wav']
-doc_formats = ['pdf', 'docx', 'txt']
-zip_formats = ['zip']
-app_formats = ['exe']
+# Define file type categories and corresponding folders
+file_categories = {
+    'Images': ['jpg', 'png', 'jpeg', 'gif'],
+    'Videos': ['mp4', 'avi', 'mkv', 'webm'],
+    'Audios': ['mp3', 'wav'],
+    'Documents': ['pdf', 'docx', 'txt'],
+    'Zips': ['zip'],
+    'Applications': ['exe']
+}
 
+# Get the directory where the script is executed
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-while True:
+# Create category folders if they don't exist
+for folder in file_categories.keys():
+    folder_path = os.path.join(script_dir, folder)
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
 
-    all_files = []
+# Organize files into corresponding folders
+for folder, sub_folders, files in os.walk(script_dir):
+    # Skip the folders we created to avoid moving them
+    if os.path.basename(folder) in file_categories.keys():
+        continue
 
-    for folder, sub_folders, files in os.walk('C:\\Users\\Yadunandan\\Desktop\\test'):
+    for file in files:
+        file_path = os.path.join(folder, file)
+        extension = file.split('.')[-1].lower()
 
-        for file in files:
-
-            file_path = os.path.join(folder, file)
-
-            if os.path.isfile(file_path):
-                all_files.append(file)
-
-    try:
-
-        for file in all_files:
-
-            extention = file.split('.')[-1]
-
-            if extention in image_formats:
-
-                if 'Images' not in os.listdir('C:\\Users\\Yadunandan\\Desktop\\test'):
-                    os.mkdir('C:\\Users\\Yadunandan\\Desktop\\test\\Images')
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Images')
-
-                else:
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Images')
-
-
-
-            if extention in video_formats:
-
-                if 'Videos' not in os.listdir('C:\\Users\\Yadunandan\\Desktop\\test'):
-                    os.mkdir('C:\\Users\\Yadunandan\\Desktop\\test\\Videos')
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Videos')
-
-                else:
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Videos')
-
-
-
-            if extention in audio_formats:
-
-                if 'Audios' not in os.listdir('C:\\Users\\Yadunandan\\Desktop\\test'):
-                    os.mkdir('C:\\Users\\Yadunandan\\Desktop\\test\\Audios')
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Audios')
-
-                else:
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Audios')
-
-
-
-            if extention in doc_formats:
-
-                if 'Documents' not in os.listdir('C:\\Users\\Yadunandan\\Desktop\\test'):
-                    os.mkdir('C:\\Users\\Yadunandan\\Desktop\\test\\Documents')
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Documents')
-
-                else:
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Documents')
-
-
-
-            if extention in zip_formats:
-
-                if 'Zips' not in os.listdir('C:\\Users\\Yadunandan\\Desktop\\test'):
-                    os.mkdir('C:\\Users\\Yadunandan\\Desktop\\test\\Zips')
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Zips')
-
-                else:
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Zips')
-
-
-
-            if extention in app_formats:
-
-                if 'Applications' not in os.listdir('C:\\Users\\Yadunandan\\Desktop\\test'):
-                    os.mkdir('C:\\Users\\Yadunandan\\Desktop\\test\\Applications')
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Applications')
-
-                else:
-                    shutil.move('C:\\Users\\Yadunandan\\Desktop\\test\\' + file, 'C:\\Users\\Yadunandan\\Desktop\\test\\Applications')
-
-    except:
-        pass
+        for category, extensions in file_categories.items():
+            if extension in extensions:
+                target_folder = os.path.join(script_dir, category)
+                shutil.move(file_path, os.path.join(target_folder, file))
+                break  # Move to next file after finding the category
